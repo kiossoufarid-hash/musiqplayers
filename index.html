@@ -1,0 +1,2177 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    >
+
+    <meta
+        name="description"
+        content="MusicPlayer - Lecteur musical personnel et studio DJ."
+    >
+
+    <meta name="theme-color" content="#08090d">
+
+    <title>MusicPlayer</title>
+
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <link
+        rel="icon"
+        type="image/png"
+        href="assets/icons/icon-192.png"
+    >
+    <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/style.css">
+
+    <!-- Lucide local : fichier placé dans /js/ -->
+    <script src="js/lucide.min.js"></script>
+</head>
+
+<body>
+
+<div id="app">
+
+    <!-- =========================================================
+         HEADER
+    ========================================================== -->
+
+    <header class="top-header">
+
+        <div class="header-left">
+
+            <button
+                id="menuBtn"
+                class="icon-btn"
+                type="button"
+                aria-label="Ouvrir le menu"
+            >
+                <i data-lucide="menu"></i>
+            </button>
+
+            <div class="brand">
+
+                <div class="brand-logo">
+                    <i data-lucide="music-2"></i>
+                </div>
+
+                <div class="brand-text">
+                    <span class="brand-name">
+                        MusicPlayer
+                    </span>
+
+                    <span
+                        id="appStatus"
+                        class="brand-status"
+                    >
+                        Prêt
+                    </span>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="header-center">
+
+            <div class="search-box">
+
+                <i data-lucide="search"></i>
+
+                <input
+                    id="searchInput"
+                    type="search"
+                    placeholder="Rechercher une musique..."
+                    autocomplete="off"
+                >
+
+                <button
+                    id="clearSearchBtn"
+                    class="search-clear-btn hidden"
+                    type="button"
+                    aria-label="Effacer"
+                >
+                    <i data-lucide="x"></i>
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <div class="header-right">
+
+            <button
+                id="installBtn"
+                class="header-action install-btn hidden"
+                type="button"
+            >
+                <i data-lucide="download"></i>
+                <span>Installer</span>
+            </button>
+
+            <button
+                id="themeBtn"
+                class="icon-btn"
+                type="button"
+                aria-label="Changer le thème"
+            >
+                <i data-lucide="sun"></i>
+            </button>
+
+        </div>
+
+    </header>
+
+
+    <!-- =========================================================
+         SIDEBAR
+    ========================================================== -->
+
+    <aside id="sidebar" class="sidebar">
+
+        <div class="sidebar-header">
+
+            <span>Bibliothèque</span>
+
+            <button
+                id="closeSidebarBtn"
+                class="icon-btn"
+                type="button"
+                aria-label="Fermer"
+            >
+                <i data-lucide="x"></i>
+            </button>
+
+        </div>
+
+
+        <nav class="sidebar-nav">
+
+            <button
+                class="sidebar-link active"
+                data-page="home"
+                type="button"
+            >
+                <i data-lucide="house"></i>
+                <span>Accueil</span>
+            </button>
+
+
+            <button
+                class="sidebar-link"
+                data-page="library"
+                type="button"
+            >
+                <i data-lucide="library"></i>
+                <span>Ma musique</span>
+            </button>
+
+
+            <button
+                class="sidebar-link"
+                data-page="favorites"
+                type="button"
+            >
+                <i data-lucide="heart"></i>
+                <span>Favoris</span>
+                <span
+                    id="sidebarFavoriteCount"
+                    class="nav-count"
+                >
+                    0
+                </span>
+            </button>
+
+
+            <button
+                class="sidebar-link"
+                data-page="playlists"
+                type="button"
+            >
+                <i data-lucide="list-music"></i>
+                <span>Playlists</span>
+            </button>
+
+
+            <button
+                class="sidebar-link"
+                data-page="dj"
+                type="button"
+            >
+                <i data-lucide="sliders-horizontal"></i>
+                <span>DJ Studio</span>
+            </button>
+
+        </nav>
+
+
+        <div class="sidebar-divider"></div>
+
+
+        <div class="sidebar-section-title">
+            <span>Vos playlists</span>
+        </div>
+
+
+        <div
+            id="sidebarPlaylistList"
+            class="sidebar-playlists"
+        >
+            <div class="empty-sidebar">
+
+                <i data-lucide="music"></i>
+
+                <span>
+                    Aucune playlist
+                </span>
+
+            </div>
+        </div>
+
+
+        <div class="sidebar-bottom">
+
+            <button
+                id="sidebarImportBtn"
+                class="sidebar-link"
+                type="button"
+            >
+                <i data-lucide="folder-plus"></i>
+                <span>Importer</span>
+            </button>
+
+
+            <button
+                id="clearLibraryBtn"
+                class="sidebar-link danger-link"
+                type="button"
+            >
+                <i data-lucide="trash-2"></i>
+                <span>Vider la bibliothèque</span>
+            </button>
+
+        </div>
+
+    </aside>
+
+
+    <!-- =========================================================
+         OVERLAY MOBILE
+    ========================================================== -->
+
+    <div
+        id="sidebarOverlay"
+        class="sidebar-overlay hidden"
+    ></div>
+
+
+    <!-- =========================================================
+         CONTENU PRINCIPAL
+    ========================================================== -->
+
+    <main
+        id="mainContent"
+        class="main-content"
+    >
+
+
+        <!-- =====================================================
+             ACCUEIL
+        ====================================================== -->
+
+        <section
+            id="homePage"
+            class="page-section active-section"
+            data-page-content="home"
+        >
+
+            <div class="welcome-area">
+
+                <div>
+
+                    <p class="section-eyebrow">
+                        VOTRE MUSIQUE
+                    </p>
+
+                    <h1>
+                        Votre musique.
+                        <span>Votre univers.</span>
+                    </h1>
+
+                    <p class="welcome-description">
+                        Écoutez vos morceaux, créez vos playlists
+                        et profitez de votre musique directement
+                        depuis MusicPlayer.
+                    </p>
+
+                </div>
+
+
+                <button
+                    id="importMusicBtn"
+                    class="primary-btn"
+                    type="button"
+                >
+                    <i data-lucide="folder-plus"></i>
+                    <span>Ajouter ma musique</span>
+                </button>
+
+            </div>
+
+
+            <!-- STATISTIQUES -->
+
+            <div class="stats-grid">
+
+                <div class="stat-card">
+
+                    <div class="stat-icon">
+                        <i data-lucide="music-2"></i>
+                    </div>
+
+                    <div class="stat-info">
+                        <span class="stat-label">
+                            Musiques
+                        </span>
+
+                        <strong id="musicCount">
+                            0
+                        </strong>
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-icon">
+                        <i data-lucide="heart"></i>
+                    </div>
+
+                    <div class="stat-info">
+                        <span class="stat-label">
+                            Favoris
+                        </span>
+
+                        <strong id="favoriteCount">
+                            0
+                        </strong>
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-icon">
+                        <i data-lucide="list-music"></i>
+                    </div>
+
+                    <div class="stat-info">
+                        <span class="stat-label">
+                            Playlists
+                        </span>
+
+                        <strong id="playlistCount">
+                            0
+                        </strong>
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-icon">
+                        <i data-lucide="hard-drive"></i>
+                    </div>
+
+                    <div class="stat-info">
+                        <span class="stat-label">
+                            Stockage
+                        </span>
+
+                        <strong id="storageCount">
+                            0 Mo
+                        </strong>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- MUSIQUES RÉCENTES -->
+
+            <div class="content-section">
+
+                <div class="section-heading">
+
+                    <div>
+
+                        <p class="section-eyebrow">
+                            BIBLIOTHÈQUE
+                        </p>
+
+                        <h2>
+                            Vos musiques
+                        </h2>
+
+                    </div>
+
+
+                    <div class="section-actions">
+
+                        <button
+                            id="sortMusicBtn"
+                            class="secondary-btn"
+                            type="button"
+                        >
+                            <i data-lucide="arrow-down-up"></i>
+                            <span>Trier</span>
+                        </button>
+
+
+                        <button
+                            id="selectMusicBtn"
+                            class="secondary-btn"
+                            type="button"
+                        >
+                            <i data-lucide="list-checks"></i>
+                            <span>Sélectionner</span>
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <div class="music-filters">
+
+                    <button
+                        class="filter-btn active"
+                        data-filter="all"
+                        type="button"
+                    >
+                        Toutes
+                    </button>
+
+                    <button
+                        class="filter-btn"
+                        data-filter="recent"
+                        type="button"
+                    >
+                        Récentes
+                    </button>
+
+                    <button
+                        class="filter-btn"
+                        data-filter="favorites"
+                        type="button"
+                    >
+                        Favoris
+                    </button>
+
+                </div>
+
+
+                <div
+                    id="musicList"
+                    class="music-list"
+                ></div>
+
+            </div>
+
+
+            <!-- PLAYLISTS ACCUEIL -->
+
+            <div class="content-section">
+
+                <div class="section-heading">
+
+                    <div>
+
+                        <p class="section-eyebrow">
+                            ORGANISATION
+                        </p>
+
+                        <h2>
+                            Vos playlists
+                        </h2>
+
+                    </div>
+
+
+                    <button
+                        id="homeCreatePlaylistBtn"
+                        class="secondary-btn"
+                        type="button"
+                    >
+                        <i data-lucide="plus"></i>
+                        Nouvelle playlist
+                    </button>
+
+                </div>
+
+
+                <div
+                    id="homePlaylistGrid"
+                    class="playlist-grid"
+                ></div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             MA MUSIQUE
+        ====================================================== -->
+
+        <section
+            id="libraryPage"
+            class="page-section"
+            data-page-content="library"
+        >
+
+            <div class="page-title">
+
+                <div>
+
+                    <p class="section-eyebrow">
+                        BIBLIOTHÈQUE
+                    </p>
+
+                    <h1>
+                        Ma musique
+                    </h1>
+
+                </div>
+
+
+                <button
+                    id="libraryImportBtn"
+                    class="primary-btn"
+                    type="button"
+                >
+                    <i data-lucide="plus"></i>
+                    Ajouter
+                </button>
+
+                <button
+                    id="libraryFolderImportBtn"
+                    class="secondary-btn"
+                    type="button"
+                >
+                    <i data-lucide="folder-open"></i>
+                    Dossier
+                </button>
+
+            </div>
+
+
+            <div class="library-toolbar">
+
+                <span id="libraryResultCount">
+                    0 musique
+                </span>
+
+
+                <div class="library-toolbar-actions">
+
+                    <button
+                        id="playAllBtn"
+                        class="secondary-btn"
+                        type="button"
+                    >
+                        <i data-lucide="play"></i>
+                        Tout lire
+                    </button>
+
+
+                    <button
+                        id="shuffleAllBtn"
+                        class="secondary-btn"
+                        type="button"
+                    >
+                        <i data-lucide="shuffle"></i>
+                        Aléatoire
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <div
+                id="libraryMusicList"
+                class="music-list"
+            ></div>
+
+        </section>
+
+
+        <!-- =====================================================
+             FAVORIS
+        ====================================================== -->
+
+        <section
+            id="favoritesPage"
+            class="page-section"
+            data-page-content="favorites"
+        >
+
+            <div class="page-title">
+
+                <div>
+
+                    <p class="section-eyebrow">
+                        VOTRE SÉLECTION
+                    </p>
+
+                    <h1>
+                        Favoris
+                    </h1>
+
+                </div>
+
+
+                <button
+                    id="playFavoritesBtn"
+                    class="primary-btn"
+                    type="button"
+                >
+                    <i data-lucide="play"></i>
+                    Lire les favoris
+                </button>
+
+            </div>
+
+
+            <div
+                id="favoritesList"
+                class="music-list"
+            ></div>
+
+        </section>
+
+
+        <!-- =====================================================
+             PLAYLISTS
+        ====================================================== -->
+
+        <section
+            id="playlistsPage"
+            class="page-section"
+            data-page-content="playlists"
+        >
+
+            <div class="page-title">
+
+                <div>
+
+                    <p class="section-eyebrow">
+                        ORGANISATION
+                    </p>
+
+                    <h1>
+                        Playlists
+                    </h1>
+
+                </div>
+
+
+                <button
+                    id="createPlaylistBtn"
+                    class="primary-btn"
+                    type="button"
+                >
+                    <i data-lucide="plus"></i>
+                    Nouvelle playlist
+                </button>
+
+            </div>
+
+
+            <div
+                id="playlistGrid"
+                class="playlist-grid"
+            ></div>
+
+        </section>
+
+
+        <!-- =====================================================
+             DJ STUDIO
+        ====================================================== -->
+
+        <section
+            id="djPage"
+            class="page-section dj-page-section"
+            data-page-content="dj"
+        >
+
+            <div class="page-title dj-page-title">
+
+                <div>
+
+                    <p class="section-eyebrow">
+                        MIXING STATION
+                    </p>
+
+                    <h1>
+                        DJ Studio
+                    </h1>
+
+                    <p>
+                        Une console DJ pour mixer vos morceaux.
+                    </p>
+
+                </div>
+
+
+                <div class="dj-header-actions">
+
+                    <button
+                        id="djResetBtn"
+                        class="secondary-btn"
+                        type="button"
+                    >
+                        <i data-lucide="rotate-ccw"></i>
+                        Réinitialiser
+                    </button>
+
+
+                    <button
+                        id="djMasterPlayBtn"
+                        class="primary-btn"
+                        type="button"
+                    >
+                        <i data-lucide="play"></i>
+                        Lecture
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- CONSOLE DJ -->
+
+            <div class="dj-console">
+
+
+                <!-- DECK A -->
+
+                <div
+                    id="deckA"
+                    class="dj-deck"
+                    data-deck="A"
+                >
+
+                    <div class="deck-header">
+
+                        <div class="deck-title">
+
+                            <span class="deck-label">
+                                DECK A
+                            </span>
+
+                            <span
+                                id="deckAStatus"
+                                class="deck-status"
+                            >
+                                STOP
+                            </span>
+
+                        </div>
+
+
+                        <button
+                            id="deckAFileBtn"
+                            class="deck-load-btn"
+                            type="button"
+                        >
+                            <i data-lucide="folder-open"></i>
+                            Charger
+                        </button>
+
+                        <input
+                            id="deckAFileInput"
+                            type="file"
+                            accept="audio/*"
+                            hidden
+                        >
+
+                    </div>
+
+
+                    <div class="deck-track-info">
+
+                        <div
+                            id="deckACover"
+                            class="deck-cover"
+                        >
+                            <i data-lucide="disc-3"></i>
+                        </div>
+
+
+                        <div class="deck-track-text">
+
+                            <strong id="deckATitle">
+                                Aucun morceau
+                            </strong>
+
+                            <span id="deckAArtist">
+                                Deck A
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="waveform-container">
+
+                        <canvas
+                            id="deckAWaveform"
+                            class="waveform"
+                        ></canvas>
+
+                        <div
+                            id="deckAPlayhead"
+                            class="waveform-playhead"
+                        ></div>
+
+                    </div>
+
+
+                    <div class="deck-time">
+
+                        <span id="deckACurrentTime">
+                            00:00
+                        </span>
+
+                        <span id="deckADuration">
+                            00:00
+                        </span>
+
+                    </div>
+
+
+                    <div class="jog-area">
+
+                        <div
+                            id="jogWheelA"
+                            class="jog-wheel"
+                            data-deck="A"
+                        >
+                            <div class="jog-center">
+                                <i data-lucide="disc-3"></i>
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                    <div class="deck-controls">
+
+                        <button
+                            id="deckAPlayBtn"
+                            class="deck-control play-control"
+                            type="button"
+                            aria-label="Lire le Deck A"
+                        >
+                            <i data-lucide="play"></i>
+                        </button>
+
+
+                        <button
+                            id="deckAPauseBtn"
+                            class="deck-control"
+                            type="button"
+                            aria-label="Mettre en pause le Deck A"
+                        >
+                            <i data-lucide="pause"></i>
+                        </button>
+
+
+                        <button
+                            id="deckAStopBtn"
+                            class="deck-control"
+                            type="button"
+                            aria-label="Arrêter le Deck A"
+                        >
+                            <i data-lucide="square"></i>
+                        </button>
+
+
+                        <button
+                            id="deckACueBtn"
+                            class="deck-control cue-control"
+                            type="button"
+                            aria-label="Lire le point Cue du Deck A"
+                        >
+                            CUE
+                        </button>
+
+                    </div>
+
+
+                    <div class="dj-control-group">
+
+                        <div class="control-label-row">
+
+                            <span>
+                                PITCH
+                            </span>
+
+                            <strong id="deckAPitchValue">
+                                0%
+                            </strong>
+
+                        </div>
+
+
+                        <input
+                            id="deckAPitch"
+                            class="dj-slider"
+                            type="range"
+                            aria-label="Pitch du Deck A"
+                            min="-50"
+                            max="50"
+                            value="0"
+                            step="1"
+                        >
+
+                    </div>
+
+
+                    <div class="dj-control-group">
+
+                        <div class="control-label-row">
+
+                            <span>
+                                VOLUME
+                            </span>
+
+                            <strong id="deckAVolumeValue">
+                                100%
+                            </strong>
+
+                        </div>
+
+
+                        <input
+                            id="deckAVolume"
+                            class="dj-slider"
+                            type="range"
+                            aria-label="Volume du Deck A"
+                            min="0"
+                            max="100"
+                            value="100"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- MIXER -->
+
+                <div class="dj-mixer">
+
+                    <div class="mixer-header">
+
+                        <span>
+                            MIXER
+                        </span>
+
+                        <i data-lucide="sliders-horizontal"></i>
+
+                    </div>
+
+
+                    <div class="mixer-master">
+
+                        <span class="mixer-label">
+                            MASTER
+                        </span>
+
+                        <input
+                            id="masterVolume"
+                            class="vertical-slider"
+                            type="range"
+                            aria-label="Volume master"
+                            min="0"
+                            max="100"
+                            value="100"
+                        >
+
+                        <strong id="masterVolumeValue">
+                            100%
+                        </strong>
+
+                    </div>
+
+
+                    <div class="crossfader-section">
+
+                        <div class="crossfader-labels">
+                            <span>A</span>
+                            <span>CROSSFADER</span>
+                            <span>B</span>
+                        </div>
+
+                        <input
+                            id="crossfader"
+                            class="crossfader"
+                            type="range"
+                            aria-label="Crossfader entre les decks A et B"
+                            min="-100"
+                            max="100"
+                            value="0"
+                        >
+
+                    </div>
+
+
+                    <div class="eq-section">
+
+                        <div class="eq-title">
+                            DECK A EQ
+                        </div>
+
+
+                        <div class="eq-controls">
+
+                            <div class="eq-control">
+
+                                <span>
+                                    HIGH
+                                </span>
+
+                                <input
+                                    id="deckBEqHigh"
+                                    class="eq-slider"
+                                    type="range"
+                                    aria-label="Egaliseur aigu du Deck B"
+                                    min="-100"
+                                    max="100"
+                                    value="0"
+                                >
+
+                            </div>
+
+
+                            <div class="eq-control">
+
+                                <span>
+                                    MID
+                                </span>
+
+                                <input
+                                    id="deckBEqMid"
+                                    class="eq-slider"
+                                    type="range"
+                                    aria-label="Egaliseur medium du Deck B"
+                                    min="-100"
+                                    max="100"
+                                    value="0"
+                                >
+
+                            </div>
+
+
+                            <div class="eq-control">
+
+                                <span>
+                                    LOW
+                                </span>
+
+                                <input
+                                    id="deckBEqLow"
+                                    class="eq-slider"
+                                    type="range"
+                                    aria-label="Egaliseur grave du Deck B"
+                                    min="-100"
+                                    max="100"
+                                    value="0"
+                                >
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="eq-section">
+
+                        <div class="eq-title">
+                            DECK B EQ
+                        </div>
+
+
+                        <div class="eq-controls">
+
+                            <div class="eq-control">
+
+                                <span>
+                                    HIGH
+                                </span>
+
+                                <input
+                                    id="deckAEqHigh"
+                                    class="eq-slider"
+                                    type="range"
+                                    aria-label="Egaliseur aigu du Deck A"
+                                    min="-100"
+                                    max="100"
+                                    value="0"
+                                >
+
+                            </div>
+
+
+                            <div class="eq-control">
+
+                                <span>
+                                    MID
+                                </span>
+
+                                <input
+                                    id="deckAEqMid"
+                                    class="eq-slider"
+                                    type="range"
+                                    aria-label="Egaliseur medium du Deck A"
+                                    min="-100"
+                                    max="100"
+                                    value="0"
+                                >
+
+                            </div>
+
+
+                            <div class="eq-control">
+
+                                <span>
+                                    LOW
+                                </span>
+
+                                <input
+                                    id="deckAEqLow"
+                                    class="eq-slider"
+                                    type="range"
+                                    aria-label="Egaliseur grave du Deck A"
+                                    min="-100"
+                                    max="100"
+                                    value="0"
+                                >
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="bpm-display">
+
+                        <span>
+                            BPM
+                        </span>
+
+                        <strong id="masterBpm">
+                            120
+                        </strong>
+
+                        <button
+                            id="syncBtn"
+                            class="sync-btn"
+                            type="button"
+                        >
+                            SYNC
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <!-- DECK B -->
+
+                <div
+                    id="deckB"
+                    class="dj-deck"
+                    data-deck="B"
+                >
+
+                    <div class="deck-header">
+
+                        <div class="deck-title">
+
+                            <span class="deck-label">
+                                DECK B
+                            </span>
+
+                            <span
+                                id="deckBStatus"
+                                class="deck-status"
+                            >
+                                STOP
+                            </span>
+
+                        </div>
+
+
+                        <button
+                            id="deckBFileBtn"
+                            class="deck-load-btn"
+                            type="button"
+                        >
+                            <i data-lucide="folder-open"></i>
+                            Charger
+                        </button>
+
+                        <input
+                            id="deckBFileInput"
+                            type="file"
+                            accept="audio/*"
+                            hidden
+                        >
+
+                    </div>
+
+
+                    <div class="deck-track-info">
+
+                        <div
+                            id="deckBCover"
+                            class="deck-cover"
+                        >
+                            <i data-lucide="disc-3"></i>
+                        </div>
+
+
+                        <div class="deck-track-text">
+
+                            <strong id="deckBTitle">
+                                Aucun morceau
+                            </strong>
+
+                            <span id="deckBArtist">
+                                Deck B
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="waveform-container">
+
+                        <canvas
+                            id="deckBWaveform"
+                            class="waveform"
+                        ></canvas>
+
+                        <div
+                            id="deckBPlayhead"
+                            class="waveform-playhead"
+                        ></div>
+
+                    </div>
+
+
+                    <div class="deck-time">
+
+                        <span id="deckBCurrentTime">
+                            00:00
+                        </span>
+
+                        <span id="deckBDuration">
+                            00:00
+                        </span>
+
+                    </div>
+
+
+                    <div class="jog-area">
+
+                        <div
+                            id="jogWheelB"
+                            class="jog-wheel"
+                            data-deck="B"
+                        >
+                            <div class="jog-center">
+                                <i data-lucide="disc-3"></i>
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                    <div class="deck-controls">
+
+                        <button
+                            id="deckBPlayBtn"
+                            class="deck-control play-control"
+                            type="button"
+                            aria-label="Lire le Deck B"
+                        >
+                            <i data-lucide="play"></i>
+                        </button>
+
+
+                        <button
+                            id="deckBPauseBtn"
+                            class="deck-control"
+                            type="button"
+                            aria-label="Mettre en pause le Deck B"
+                        >
+                            <i data-lucide="pause"></i>
+                        </button>
+
+
+                        <button
+                            id="deckBStopBtn"
+                            class="deck-control"
+                            type="button"
+                            aria-label="Arrêter le Deck B"
+                        >
+                            <i data-lucide="square"></i>
+                        </button>
+
+
+                        <button
+                            id="deckBCueBtn"
+                            class="deck-control cue-control"
+                            type="button"
+                            aria-label="Lire le point Cue du Deck B"
+                        >
+                            CUE
+                        </button>
+
+                    </div>
+
+
+                    <div class="dj-control-group">
+
+                        <div class="control-label-row">
+
+                            <span>
+                                PITCH
+                            </span>
+
+                            <strong id="deckBPitchValue">
+                                0%
+                            </strong>
+
+                        </div>
+
+
+                        <input
+                            id="deckBPitch"
+                            class="dj-slider"
+                            type="range"
+                            aria-label="Pitch du Deck B"
+                            min="-50"
+                            max="50"
+                            value="0"
+                            step="1"
+                        >
+
+                    </div>
+
+
+                    <div class="dj-control-group">
+
+                        <div class="control-label-row">
+
+                            <span>
+                                VOLUME
+                            </span>
+
+                            <strong id="deckBVolumeValue">
+                                100%
+                            </strong>
+
+                        </div>
+
+
+                        <input
+                            id="deckBVolume"
+                            class="dj-slider"
+                            type="range"
+                            aria-label="Volume du Deck B"
+                            min="0"
+                            max="100"
+                            value="100"
+                        >
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- HOT CUES + EFFETS -->
+
+            <div class="dj-bottom-panel">
+
+
+                <div class="dj-panel-card">
+
+                    <div class="dj-panel-header">
+
+                        <div>
+
+                            <span class="section-eyebrow">
+                                PERFORMANCE
+                            </span>
+
+                            <h3>
+                                Hot Cues
+                            </h3>
+
+                        </div>
+
+                        <span class="panel-hint">
+                            Deck A
+                        </span>
+
+                    </div>
+
+
+                    <div
+                        id="hotCuesA"
+                        class="hot-cues"
+                    >
+
+                        <button
+                            class="hot-cue"
+                            data-cue="1"
+                            type="button"
+                        >
+                            <span>1</span>
+                        </button>
+
+                        <button
+                            class="hot-cue"
+                            data-cue="2"
+                            type="button"
+                        >
+                            <span>2</span>
+                        </button>
+
+                        <button
+                            class="hot-cue"
+                            data-cue="3"
+                            type="button"
+                        >
+                            <span>3</span>
+                        </button>
+
+                        <button
+                            class="hot-cue"
+                            data-cue="4"
+                            type="button"
+                        >
+                            <span>4</span>
+                        </button>
+
+                        <button
+                            class="hot-cue"
+                            data-cue="5"
+                            type="button"
+                        >
+                            <span>5</span>
+                        </button>
+
+                        <button
+                            class="hot-cue"
+                            data-cue="6"
+                            type="button"
+                        >
+                            <span>6</span>
+                        </button>
+
+                        <button
+                            class="hot-cue"
+                            data-cue="7"
+                            type="button"
+                        >
+                            <span>7</span>
+                        </button>
+
+                        <button
+                            class="hot-cue"
+                            data-cue="8"
+                            type="button"
+                        >
+                            <span>8</span>
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <div class="dj-panel-card">
+
+                    <div class="dj-panel-header">
+
+                        <div>
+
+                            <span class="section-eyebrow">
+                                EFFETS
+                            </span>
+
+                            <h3>
+                                Effets audio
+                            </h3>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="effects-grid">
+
+                        <button
+                            id="effectEchoBtn"
+                            class="effect-btn"
+                            type="button"
+                        >
+                            <i data-lucide="waves"></i>
+                            <span>Echo</span>
+                        </button>
+
+
+                        <button
+                            id="effectReverbBtn"
+                            class="effect-btn"
+                            type="button"
+                        >
+                            <i data-lucide="radio"></i>
+                            <span>Reverb</span>
+                        </button>
+
+
+                        <button
+                            id="effectFilterBtn"
+                            class="effect-btn"
+                            type="button"
+                        >
+                            <i data-lucide="filter"></i>
+                            <span>Filter</span>
+                        </button>
+
+
+                        <button
+                            id="effectFlangerBtn"
+                            class="effect-btn"
+                            type="button"
+                        >
+                            <i data-lucide="audio-lines"></i>
+                            <span>Flanger</span>
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- =========================================================
+         MINI PLAYER
+    ========================================================== -->
+
+    <section
+        id="miniPlayer"
+        class="mini-player"
+    >
+
+        <div class="mini-track">
+
+            <div
+                id="miniCover"
+                class="mini-cover"
+            >
+                <i data-lucide="music-2"></i>
+            </div>
+
+
+            <div class="mini-track-info">
+
+                <strong id="miniTitle">
+                    Aucun morceau
+                </strong>
+
+                <span id="miniArtist">
+                    MusicPlayer
+                </span>
+
+            </div>
+
+
+            <button
+                id="miniFavoriteBtn"
+                class="mini-icon-btn"
+                type="button"
+                aria-label="Favori"
+            >
+                <i data-lucide="heart"></i>
+            </button>
+
+        </div>
+
+
+        <div class="mini-player-center">
+
+            <div class="player-controls">
+
+                <button
+                    id="previousBtn"
+                    class="player-control"
+                    type="button"
+                    aria-label="Précédent"
+                >
+                    <i data-lucide="skip-back"></i>
+                </button>
+
+
+                <button
+                    id="mainPlayBtn"
+                    class="main-play-btn"
+                    type="button"
+                    aria-label="Lecture"
+                >
+                    <i data-lucide="play"></i>
+                </button>
+
+
+                <button
+                    id="nextBtn"
+                    class="player-control"
+                    type="button"
+                    aria-label="Suivant"
+                >
+                    <i data-lucide="skip-forward"></i>
+                </button>
+
+            </div>
+
+
+            <div class="progress-area">
+
+                <span
+                    id="currentTime"
+                    class="time-label"
+                >
+                    00:00
+                </span>
+
+
+                <div
+                    id="progressContainer"
+                    class="progress-container"
+                >
+
+                    <div
+                        id="progressBar"
+                        class="progress-bar"
+                    ></div>
+
+                    <div
+                        id="progressThumb"
+                        class="progress-thumb"
+                    ></div>
+
+                </div>
+
+
+                <span
+                    id="duration"
+                    class="time-label"
+                >
+                    00:00
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="mini-player-right">
+
+            <button
+                id="shuffleBtn"
+                class="player-control"
+                type="button"
+                aria-label="Aléatoire"
+            >
+                <i data-lucide="shuffle"></i>
+            </button>
+
+
+            <button
+                id="repeatBtn"
+                class="player-control"
+                type="button"
+                aria-label="Répéter"
+            >
+                <i data-lucide="repeat"></i>
+            </button>
+
+
+            <div class="volume-control">
+
+                <i data-lucide="volume-2"></i>
+
+                <input
+                    id="volumeSlider"
+                    type="range"
+                    min="0"
+                    max="100"
+                    value="100"
+                    aria-label="Volume"
+                >
+
+            </div>
+
+
+            <button
+                id="queueBtn"
+                class="player-control"
+                type="button"
+                aria-label="File d'attente"
+            >
+                <i data-lucide="list-video"></i>
+            </button>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================================================
+         NAVIGATION MOBILE
+    ========================================================== -->
+
+    <nav
+        id="bottomNav"
+        class="bottom-nav"
+    >
+
+        <button
+            class="bottom-nav-item active"
+            data-page="home"
+            type="button"
+        >
+            <i data-lucide="house"></i>
+            <span>Accueil</span>
+        </button>
+
+
+        <button
+            class="bottom-nav-item"
+            data-page="library"
+            type="button"
+        >
+            <i data-lucide="library"></i>
+            <span>Musique</span>
+        </button>
+
+
+        <button
+            id="mobileImportBtn"
+            class="bottom-nav-add"
+            type="button"
+            aria-label="Ajouter une musique"
+        >
+            <span>
+                <i data-lucide="plus"></i>
+            </span>
+        </button>
+
+
+        <button
+            class="bottom-nav-item"
+            data-page="favorites"
+            type="button"
+        >
+            <i data-lucide="heart"></i>
+            <span>Favoris</span>
+        </button>
+
+
+        <button
+            class="bottom-nav-item"
+            data-page="dj"
+            type="button"
+        >
+            <i data-lucide="sliders-horizontal"></i>
+            <span>DJ</span>
+        </button>
+
+    </nav>
+
+</div>
+
+
+<!-- =========================================================
+     INPUTS D'IMPORTATION
+========================================================== -->
+
+<input
+    id="audioFileInput"
+    type="file"
+    accept="audio/*"
+    multiple
+    hidden
+>
+
+<input
+    id="folderInput"
+    type="file"
+    accept="audio/*"
+    webkitdirectory
+    directory
+    multiple
+    hidden
+>
+
+
+<!-- =========================================================
+     MODAL PLAYLIST
+========================================================== -->
+
+<div
+    id="playlistModal"
+    class="modal hidden"
+    aria-hidden="true"
+>
+
+    <div class="modal-overlay"></div>
+
+    <div class="modal-content">
+
+        <div class="modal-header">
+
+            <div>
+
+                <span class="section-eyebrow">
+                    BIBLIOTHÈQUE
+                </span>
+
+                <h2>
+                    Nouvelle playlist
+                </h2>
+
+            </div>
+
+
+            <button
+                id="closePlaylistModalBtn"
+                class="icon-btn"
+                type="button"
+                aria-label="Fermer"
+            >
+                <i data-lucide="x"></i>
+            </button>
+
+        </div>
+
+
+        <div class="modal-body">
+
+            <label
+                class="input-label"
+                for="playlistNameInput"
+            >
+                Nom de la playlist
+            </label>
+
+            <input
+                id="playlistNameInput"
+                class="text-input"
+                type="text"
+                maxlength="50"
+                placeholder="Ex. Mes sons préférés"
+                autocomplete="off"
+            >
+
+            <p
+                id="playlistNameError"
+                class="input-error hidden"
+            >
+                Entrez un nom de playlist.
+            </p>
+
+        </div>
+
+
+        <div class="modal-footer">
+
+            <button
+                id="cancelPlaylistBtn"
+                class="secondary-btn"
+                type="button"
+            >
+                Annuler
+            </button>
+
+
+            <button
+                id="savePlaylistBtn"
+                class="primary-btn"
+                type="button"
+            >
+                <i data-lucide="check"></i>
+                Créer
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     MODAL FILE D'ATTENTE
+========================================================== -->
+
+<div
+    id="queueModal"
+    class="modal hidden"
+    aria-hidden="true"
+>
+
+    <div class="modal-overlay"></div>
+
+    <div class="modal-content queue-modal-content">
+
+        <div class="modal-header">
+
+            <div>
+
+                <span class="section-eyebrow">
+                    LECTEUR
+                </span>
+
+                <h2>
+                    File d'attente
+                </h2>
+
+            </div>
+
+
+            <button
+                id="closeQueueModalBtn"
+                class="icon-btn"
+                type="button"
+                aria-label="Fermer"
+            >
+                <i data-lucide="x"></i>
+            </button>
+
+        </div>
+
+
+        <div
+            id="queueList"
+            class="queue-list"
+        ></div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     MODAL OPTIONS MUSIQUE
+========================================================== -->
+
+<div
+    id="trackOptionsModal"
+    class="modal hidden"
+    aria-hidden="true"
+>
+
+    <div class="modal-overlay"></div>
+
+    <div class="modal-content">
+
+        <div class="modal-header">
+
+            <div>
+
+                <span class="section-eyebrow">
+                    MUSIQUE
+                </span>
+
+                <h2 id="trackOptionsTitle">
+                    Options
+                </h2>
+
+            </div>
+
+
+            <button
+                id="closeTrackOptionsBtn"
+                class="icon-btn"
+                type="button"
+                aria-label="Fermer"
+            >
+                <i data-lucide="x"></i>
+            </button>
+
+        </div>
+
+
+        <div class="track-options">
+
+            <button
+                id="trackOptionPlay"
+                class="track-option-btn"
+                type="button"
+            >
+                <i data-lucide="play"></i>
+                <span>Lire maintenant</span>
+            </button>
+
+
+            <button
+                id="trackOptionFavorite"
+                class="track-option-btn"
+                type="button"
+            >
+                <i data-lucide="heart"></i>
+                <span>Ajouter aux favoris</span>
+            </button>
+
+
+            <button
+                id="trackOptionPlaylist"
+                class="track-option-btn"
+                type="button"
+            >
+                <i data-lucide="list-plus"></i>
+                <span>Ajouter à une playlist</span>
+            </button>
+
+
+            <button
+                id="trackOptionDj"
+                class="track-option-btn"
+                type="button"
+            >
+                <i data-lucide="sliders-horizontal"></i>
+                <span>Charger dans DJ Studio</span>
+            </button>
+
+
+            <button
+                id="trackOptionRemove"
+                class="track-option-btn danger-option"
+                type="button"
+            >
+                <i data-lucide="trash-2"></i>
+                <span>Supprimer</span>
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     TOAST
+========================================================== -->
+
+<div
+    id="toast"
+    class="toast"
+    role="status"
+    aria-live="polite"
+>
+
+    <div
+        id="toastIcon"
+        class="toast-icon"
+    >
+        <i data-lucide="check-circle-2"></i>
+    </div>
+
+
+    <div class="toast-content">
+
+        <strong id="toastTitle">
+            Terminé
+        </strong>
+
+        <span id="toastMessage"></span>
+
+    </div>
+
+
+    <button
+        id="toastCloseBtn"
+        class="toast-close"
+        type="button"
+        aria-label="Fermer"
+    >
+        <i data-lucide="x"></i>
+    </button>
+
+</div>
+
+
+<!-- =========================================================
+     AUDIO
+========================================================== -->
+
+<audio
+    id="mainAudio"
+    preload="metadata"
+></audio>
+
+
+<audio
+    id="deckAAudio"
+    preload="metadata"
+></audio>
+
+
+<audio
+    id="deckBAudio"
+    preload="metadata"
+></audio>
+
+
+<!-- =========================================================
+     JAVASCRIPT
+========================================================== -->
+
+<script src="js/app.js"></script>
+
+</body>
+</html>
